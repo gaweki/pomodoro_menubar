@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULANG SEKARANG! 🎉</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, 
+                #ffeaa7, #dfe6e9, #ff7675, #a29bfe);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            padding: 60px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInScale 1s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .emoji {
+            font-size: 120px;
+            animation: bounce 2s ease-in-out infinite;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        h1 {
+            font-size: 80px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 20px rgba(255, 255, 255, 0.3),
+                4px 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .subtitle {
+            font-size: 28px;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 40px;
+            font-weight: 300;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .time {
+            font-size: 48px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .motivational {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 30px;
+            font-style: italic;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <script>
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.width = particle.style.height = (Math.random() * 8 + 4) + 'px';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <div class="emoji">🎉</div>
+        <h1>PULANG SEKARANG!</h1>
+        <p class="subtitle">Saatnya istirahat, kerja keras hari ini sudah cukup! 💪</p>
+        
+        <div class="time" id="current-time">18:00:00</div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="sessions-count">-</div>
+                <div class="stat-label">Sessions Hari Ini</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="total-minutes">-</div>
+                <div class="stat-label">Menit Fokus</div>
+            </div>
+        </div>
+        
+        <p class="motivational">"Work hard, rest harder! See you tomorrow! 🌟"</p>
+    </div>
+
+    <script>
+        // Update clock
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Load session stats from session_logs.json
+        async function loadStats() {
+            try {
+                const response = await fetch('session_logs.json');
+                const data = await response.json();
+                
+                // Get today's date
+                const today = new Date().toISOString().split('T')[0];
+                
+                // Filter sessions from today
+                const todaySessions = data.sessions.filter(session => {
+                    return session.start_time.startsWith(today);
+                });
+                
+                // Calculate stats
+                const sessionCount = todaySessions.length;
+                const totalMinutes = todaySessions.reduce((sum, session) => {
+                    return sum + (session.duration_minutes || 0);
+                }, 0);
+                
+                // Update display
+                document.getElementById('sessions-count').textContent = sessionCount;
+                document.getElementById('total-minutes').textContent = totalMinutes;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('sessions-count').textContent = '0';
+                document.getElementById('total-minutes').textContent = '0';
+            }
+        }
+        
+        loadStats();
+    </script>
+</body>
+</html>
