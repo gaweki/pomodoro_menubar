@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Task</title>
+    <style>
+        :root {
+            --bg-color: #1a1b26;
+            --card-bg: #24283b;
+            --text-color: #a9b1d6;
+            --accent-color: #7aa2f7;
+            --border-color: #414868;
+            --success-color: #9ece6a;
+            --danger-color: #f7768e;
+            --active-bg: #f7768e;
+            --active-text: #ffffff;
+            --inactive-bg: #414868;
+            --inactive-text: #a9b1d6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Repeat Section Styling */
+        .repeat-container {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .repeat-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .repeat-label {
+            white-space: nowrap;
+            margin-bottom: 0;
+        }
+
+        .repeat-input {
+            width: 80px !important;
+            text-align: center;
+        }
+
+        .repeat-select {
+            flex: 1;
+        }
+
+        /* Day Chips Styling */
+        .days-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: space-between;
+        }
+
+        .day-chip {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem 0;
+            background-color: var(--inactive-bg);
+            color: var(--inactive-text);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .day-chip:hover {
+            opacity: 0.9;
+        }
+
+        .day-chip.active {
+            background-color: var(--active-bg);
+            color: var(--active-text);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #1a1b26;
+        }
+
+        .btn-secondary {
+            background-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #status {
+            margin-top: 1rem;
+            text-align: center;
+            min-height: 1.2em;
+            font-size: 0.9rem;
+        }
+
+        .success {
+            color: var(--success-color);
+        }
+
+        .error {
+            color: var(--danger-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Edit Task</h1>
+        <form id="editForm">
+            <input type="hidden" id="taskId" value="{{TASK_ID}}">
+
+            <div class="form-group">
+                <label for="name">Task Name</label>
+                <input type="text" id="name" value="{{TASK_NAME}}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority">
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Repeat Schedule</label>
+                <div class="repeat-container">
+                    <div class="repeat-row">
+                        <label class="repeat-label">Every</label>
+                        <input type="number" id="repeatNumber" class="repeat-input" value="{{REPEAT_NUMBER}}" min="1"
+                            placeholder="1">
+                        <select id="repeatUnit" class="repeat-select">
+                            <option value="">None (One-time)</option>
+                            <option value="day">Day(s)</option>
+                            <option value="week">Week(s)</option>
+                            <option value="month">Month(s)</option>
+                            <option value="year">Year(s)</option>
+                        </select>
+                    </div>
+
+                    <div id="daysContainer" class="days-container hidden">
+                        <div class="day-chip" data-value="0">Mo</div>
+                        <div class="day-chip" data-value="1">Tu</div>
+                        <div class="day-chip" data-value="2">We</div>
+                        <div class="day-chip" data-value="3">Th</div>
+                        <div class="day-chip" data-value="4">Fr</div>
+                        <div class="day-chip" data-value="5">Sa</div>
+                        <div class="day-chip" data-value="6">Su</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+
+            <div id="status"></div>
+        </form>
+    </div>
+
+    <script>
+        // Initialize values
+        document.getElementById('priority').value = "{{TASK_PRIORITY}}";
+
+        const repeatUnitSelect = document.getElementById('repeatUnit');
+        const repeatNumberInput = document.getElementById('repeatNumber');
+        const daysContainer = document.getElementById('daysContainer');
+        const dayChips = document.querySelectorAll('.day-chip');
+
+        // Set initial repeat values
+        const initialUnit = "{{REPEAT_UNIT}}";
+        if (initialUnit) {
+            repeatUnitSelect.value = initialUnit;
+        } else {
+            repeatUnitSelect.value = ""; // Default to None
+        }
+
+        // Handle Days Logic
+        let selectedDays = [];
+        const allowedDaysData = {{ ALLOWED_DAYS }};
+
+        if (allowedDaysData && Array.isArray(allowedDaysData)) {
+            selectedDays = allowedDaysData;
+            // Update chips UI
+            dayChips.forEach(chip => {
+                const val = parseInt(chip.dataset.value);
+                if (selectedDays.includes(val)) {
+                    chip.classList.add('active');
+                }
+            });
+        }
+
+        // Toggle visibility of days container
+        function updateDaysVisibility() {
+            if (repeatUnitSelect.value === 'week') {
+                daysContainer.classList.remove('hidden');
+            } else {
+                daysContainer.classList.add('hidden');
+            }
+        }
+
+        // Initial check
+        updateDaysVisibility();
+
+        // Listen for unit changes
+        repeatUnitSelect.addEventListener('change', updateDaysVisibility);
+
+        // Handle chip clicks
+        dayChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                const val = parseInt(chip.dataset.value);
+                chip.classList.toggle('active');
+
+                if (chip.classList.contains('active')) {
+                    if (!selectedDays.includes(val)) selectedDays.push(val);
+                } else {
+                    selectedDays = selectedDays.filter(d => d !== val);
+                }
+            });
+        });
+
+        // Cancel Button Logic
+        document.getElementById('cancelBtn').addEventListener('click', async () => {
+            const status = document.getElementById('status');
+            status.textContent = "Cancelling...";
+
+            try {
+                await fetch('/cancel', { method: 'POST' });
+                window.close();
+            } catch (err) {
+                console.error("Error cancelling:", err);
+                window.close(); // Close anyway
+            }
+        });
+
+        // Save Logic
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            status.textContent = "Saving...";
+            status.className = "";
+
+            // Prepare data
+            const unit = repeatUnitSelect.value;
+            let num = repeatNumberInput.value;
+
+            // If unit is None, clear number
+            if (!unit) {
+                num = null;
+            } else if (!num) {
+                num = 1; // Default to 1 if unit selected but no number
+            }
+
+            // Only send allowed_days if unit is 'week'
+            // If user switches to 'day' or 'month', we probably should clear allowed_days
+            // But let's keep it simple: if unit is NOT week, send null for allowed_days
+            const daysToSend = (unit === 'week' && selectedDays.length > 0) ? selectedDays : null;
+
+            const data = {
+                id: document.getElementById('taskId').value,
+                name: document.getElementById('name').value,
+                priority: document.getElementById('priority').value,
+                repeat_number: num,
+                repeat_unit: unit || "",
+                allowed_days: daysToSend
+            };
+
+            try {
+                const response = await fetch('/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    status.textContent = "Saved successfully!";
+                    status.className = "success";
+                    setTimeout(() => window.close(), 1000);
+                } else {
+                    throw new Error('Save failed');
+                }
+            } catch (err) {
+                status.textContent = "Error saving changes.";
+                status.className = "error";
+                console.error(err);
+            }
+        });
+
+        // Initialize shutdown handler
+        window.addEventListener('pagehide', function () {
+            navigator.sendBeacon('/shutdown');
+        });
+    </script>
+</body>
+
+</html>
+```

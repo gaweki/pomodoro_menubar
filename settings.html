@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Settings</title>
+    <style>
+        :root {
+            --bg-color: #0f0f14;
+            --card-bg: #1a1b26;
+            --text-color: #a9b1d6;
+            --accent-color: #7aa2f7;
+            --accent-hover: #89b4fa;
+            --border-color: #414868;
+            --success-color: #9ece6a;
+            --work-color: #f7768e;
+            --short-break-color: #9ece6a;
+            --long-break-color: #7aa2f7;
+            --lunch-color: #e0af68;
+            --hover-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            opacity: 0.7;
+            font-size: 1.1rem;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .setting-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .setting-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .setting-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .current-icon {
+            font-size: 3rem;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+        }
+
+        .setting-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .setting-desc {
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        .work .setting-title {
+            color: var(--work-color);
+        }
+
+        .short-break .setting-title {
+            color: var(--short-break-color);
+        }
+
+        .long-break .setting-title {
+            color: var(--long-break-color);
+        }
+
+        .lunch .setting-title {
+            color: var(--lunch-color);
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* Custom Scrollbar */
+        .icon-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .icon-grid::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .icon-grid::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .icon-option {
+            font-size: 1.8rem;
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--hover-bg);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .icon-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+            z-index: 1;
+        }
+
+        .icon-option.selected {
+            border-color: var(--accent-color);
+            background: rgba(122, 162, 247, 0.15);
+            box-shadow: 0 0 15px rgba(122, 162, 247, 0.2);
+        }
+
+        .actions {
+            margin-top: 3rem;
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #1a1b26;
+            box-shadow: 0 4px 15px rgba(122, 162, 247, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(122, 162, 247, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+            border-color: var(--text-color);
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 1rem;
+            min-height: 1.5em;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .status.visible {
+            opacity: 1;
+        }
+
+        .status.success {
+            color: var(--success-color);
+        }
+
+        .status.error {
+            color: var(--work-color);
+        }
+
+        /* Custom icon input */
+        .custom-input {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .custom-input input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1.2rem;
+            text-align: center;
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+            transition: border-color 0.2s ease;
+        }
+
+        .custom-input input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .custom-input button {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .custom-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* Emoji display fixes */
+        .emoji-fix {
+            /* display: inline-block; Removed to prevent conflict with flexbox */
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Ensure proper emoji rendering */
+        .current-icon,
+        .icon-option {
+            unicode-bidi: isolate;
+            font-variant-emoji: emoji;
+            line-height: 1;
+            /* Ensure vertical centering */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ Pomodoro Settings</h1>
+            <p class="subtitle">Customize your session icons</p>
+        </header>
+
+        <div class="settings-grid">
+            <!-- Work Icon -->
+            <div class="setting-card work">
+                <div class="setting-header">
+                    <div class="current-icon emoji-fix" id="work-current">⬆️🔥</div>
+                    <div>
+                        <div class="setting-title">Work Session</div>
+                        <div class="setting-desc">Icon shown during focus time</div>
+                    </div>
+                </div>
+                <div class="icon-grid" data-type="work">
+                    <!-- Icons filled by JS -->
+                </div>
+                <div class="custom-input">
+                    <div style="flex:1">
+                        <div class="custom-label">Custom emoji:</div>
+                        <input type="text" id="work-custom" placeholder="🔴" maxlength="4">
+                    </div>
+                    <button class="btn-secondary" onclick="applyCustom('work')">Apply</button>
+                </div>
+            </div>
+
+            <!-- Short Break Icon -->
+            <div class="setting-card short-break">
+                <div class="setting-header">
+                    <div class="current-icon emoji-fix" id="short-break-current">🚶🚾</div>
+                    <div>
+                        <div class="setting-title">Short Break</div>
+                        <div class="setting-desc">Icon shown during 5-min breaks</div>
+                    </div>
+                </div>
+                <div class="icon-grid" data-type="short_break">
+                    <!-- Icons filled by JS -->
+                </div>
+                <div class="custom-input">
+                    <div style="flex:1">
+                        <div class="custom-label">Custom emoji:</div>
+                        <input type="text" id="short_break-custom" placeholder="🟢" maxlength="4">
+                    </div>
+                    <button class="btn-secondary" onclick="applyCustom('short_break')">Apply</button>
+                </div>
+            </div>
+
+            <!-- Long Break Icon -->
+            <div class="setting-card long-break">
+                <div class="setting-header">
+                    <div class="current-icon emoji-fix" id="long-break-current">🥱🥤</div>
+                    <div>
+                        <div class="setting-title">Long Break</div>
+                        <div class="setting-desc">Icon shown during 15-min breaks</div>
+                    </div>
+                </div>
+                <div class="icon-grid" data-type="long_break">
+                    <!-- Icons filled by JS -->
+                </div>
+                <div class="custom-input">
+                    <div style="flex:1">
+                        <div class="custom-label">Custom emoji:</div>
+                        <input type="text" id="long_break-custom" placeholder="🔵" maxlength="4">
+                    </div>
+                    <button class="btn-secondary" onclick="applyCustom('long_break')">Apply</button>
+                </div>
+            </div>
+
+            <!-- Lunch Icon -->
+            <div class="setting-card lunch">
+                <div class="setting-header">
+                    <div class="current-icon emoji-fix" id="lunch-current">🍽️</div>
+                    <div>
+                        <div class="setting-title">Lunch Break</div>
+                        <div class="setting-desc">Icon shown during lunch hour</div>
+                    </div>
+                </div>
+                <div class="icon-grid" data-type="lunch">
+                    <!-- Icons filled by JS -->
+                </div>
+                <div class="custom-input">
+                    <div style="flex:1">
+                        <div class="custom-label">Custom emoji:</div>
+                        <input type="text" id="lunch-custom" placeholder="🍽️" maxlength="4">
+                    </div>
+                    <button class="btn-secondary" onclick="applyCustom('lunch')">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-secondary" onclick="resetToDefault()">🔄 Reset to Default</button>
+            <button class="btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+        </div>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        // Available icons
+        const iconOptions = [
+            "🔴", "🟢", "🔵", "🟡", "🟠", "🟣", "⚪", "⚫",
+            "⬆️", "⬇️", "➡️", "⬅️", "🔥", "💪", "🚶", "🏃",
+            "🥱", "😴", "🧘", "☕", "🍽️", "🍕", "🍔", "🥗",
+            "✨", "⚡", "🎯", "⏱️", "⏰", "🕐", "📖", "💻",
+            "🎮", "🎧", "🎵", "🌟", "💎", "🚀", "🌈", "🔔"
+        ];
+
+        // Current settings
+        let settings = {
+            icons: {
+                work: "⬆️🔥",
+                short_break: "🚶🚾",
+                long_break: "🥱🥤",
+                lunch: "🍽️"
+            }
+        };
+
+        // Load settings on page load
+        async function loadSettings() {
+            try {
+                const response = await fetch('/settings');
+                if (response.ok) {
+                    settings = await response.json();
+                    updateUI();
+                }
+            } catch (e) {
+                console.log('Using default settings');
+            }
+        }
+
+        // Update UI with current settings
+        function updateUI() {
+            // Update current icons display
+            const workIcon = document.getElementById('work-current');
+            const shortBreakIcon = document.getElementById('short-break-current');
+            const longBreakIcon = document.getElementById('long-break-current');
+            const lunchIcon = document.getElementById('lunch-current');
+
+            workIcon.textContent = settings.icons.work;
+            shortBreakIcon.textContent = settings.icons.short_break;
+            longBreakIcon.textContent = settings.icons.long_break;
+            lunchIcon.textContent = settings.icons.lunch;
+
+            // Force emoji rendering
+            [workIcon, shortBreakIcon, longBreakIcon, lunchIcon].forEach(el => {
+                el.style.fontFamily = "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif";
+            });
+
+            // Update selected state in grids
+            document.querySelectorAll('.icon-option').forEach(el => {
+                const type = el.closest('.icon-grid').dataset.type;
+                const typeKey = type.replace('-', '_');
+                el.classList.toggle('selected', el.textContent === settings.icons[typeKey]);
+            });
+        }
+
+        // Populate icon grids
+        function populateIconGrids() {
+            document.querySelectorAll('.icon-grid').forEach(grid => {
+                const type = grid.dataset.type;
+                grid.innerHTML = iconOptions.map(icon => `
+                    <div class="icon-option emoji-fix" onclick="selectIcon('${type}', '${icon}')">${icon}</div>
+                `).join('');
+            });
+        }
+
+        // Select an icon
+        function selectIcon(type, icon) {
+            settings.icons[type] = icon;
+            updateUI();
+            showStatus(`Selected ${icon} for ${type.replace('_', ' ')}`, 'success');
+        }
+
+        // Apply custom icon
+        function applyCustom(type) {
+            const input = document.getElementById(`${type}-custom`);
+            const value = input.value.trim();
+            if (value) {
+                settings.icons[type] = value;
+                updateUI();
+                input.value = '';
+                showStatus(`Applied custom icon ${value}`, 'success');
+            }
+        }
+
+        // Save settings to server
+        async function saveSettings() {
+            try {
+                const response = await fetch('/save_settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+
+                if (response.ok) {
+                    showStatus('✓ Settings saved successfully!', 'success');
+                } else {
+                    throw new Error('Save failed');
+                }
+            } catch (e) {
+                showStatus('Error saving settings', 'error');
+            }
+        }
+
+        // Reset to default
+        function resetToDefault() {
+            settings.icons = {
+                work: "⬆️🔥",
+                short_break: "🚶🚾",
+                long_break: "🥱🥤",
+                lunch: "🍽️"
+            };
+            updateUI();
+            showStatus('Reset to default icons', 'success');
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type} visible`;
+
+            // Clear previous timeout if exists
+            if (status.timeoutId) clearTimeout(status.timeoutId);
+
+            status.timeoutId = setTimeout(() => {
+                status.classList.remove('visible');
+                // Wait for transition to finish before clearing text
+                setTimeout(() => {
+                    if (!status.classList.contains('visible')) {
+                        status.textContent = '';
+                        status.className = 'status';
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize
+        populateIconGrids();
+        loadSettings();
+
+        // Handle page unload (close/navigate) to shut down server
+        // Using pagehide instead of visibilitychange so it doesn't trigger on tab switch
+        window.addEventListener('pagehide', function () {
+            navigator.sendBeacon('/shutdown');
+        });
+    </script>
+</body>
+
+</html>

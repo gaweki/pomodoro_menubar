@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.developer.pomodoro.menubar</string>
+    <string>com.pomodoro.menubar</string>
     
     <key>ProgramArguments</key>
     <array>
         <string>/usr/bin/python3</string>
-        <string>/Users/developer/pomodoro_terminal/pomodoro_menubar.py</string>
+        <string>/Users/developer/pomodoro_menubar/main.py</string>
     </array>
     
     <key>RunAtLoad</key>
@@ -17,11 +17,8 @@
     <key>KeepAlive</key>
     <true/>
     
-    <key>StandardOutPath</key>
-    <string>/Users/developer/pomodoro_terminal/menubar_output.log</string>
-    
     <key>StandardErrorPath</key>
-    <string>/Users/developer/pomodoro_terminal/menubar_error.log</string>
+    <string>/Users/developer/pomodoro_menubar/menubar_error.log</string>
     
     <key>EnvironmentVariables</key>
     <dict>

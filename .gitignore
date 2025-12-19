@@ -1,2 +1,8 @@
-session_logs.json
+session_logs*.json
+session_logs.json*
 tasks.json
+menubar_error.log
+break_temp.html
+go_home_temp.html
+debug.log
+data/

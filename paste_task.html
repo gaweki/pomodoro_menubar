@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Add Task - Paste</title>
+    <style>
+        :root {
+            --bg-color: #1a1b26;
+            --card-bg: #24283b;
+            --text-color: #a9b1d6;
+            --accent-color: #7aa2f7;
+            --border-color: #414868;
+            --success-color: #9ece6a;
+            --danger-color: #f7768e;
+            --highlight-color: rgba(122, 162, 247, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .paste-area {
+            background-color: var(--bg-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: text;
+            position: relative;
+        }
+
+        .paste-area:focus-within,
+        .paste-area.active {
+            border-color: var(--accent-color);
+            background-color: var(--highlight-color);
+        }
+
+        .paste-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .paste-text {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .keyboard-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        .key {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        /* Hidden textarea for capturing paste */
+        #taskInput {
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .settings-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        select {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        #status {
+            margin-top: 1rem;
+            text-align: center;
+            min-height: 1.2em;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .success {
+            color: var(--success-color);
+        }
+
+        .error {
+            color: var(--danger-color);
+        }
+
+        .processing {
+            color: var(--accent-color);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background-color: var(--bg-color);
+            border-radius: 2px;
+            margin-top: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>✨ Quick Add Task</h1>
+
+        <div class="settings-bar">
+            <span>Default Priority:</span>
+            <select id="priority">
+                <option value="High" selected>High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+        </div>
+
+        <div id="pasteArea" class="paste-area" tabindex="0">
+            <div class="paste-icon">📋</div>
+            <div class="paste-text">Just Paste (Cmd+V)</div>
+            <div class="keyboard-hint">
+                Tasks will be created immediately
+            </div>
+            <textarea id="taskInput" autofocus></textarea>
+        </div>
+
+        <div id="status">Waiting for paste...</div>
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <script>
+        const pasteArea = document.getElementById('pasteArea');
+        const taskInput = document.getElementById('taskInput');
+        const status = document.getElementById('status');
+        const prioritySelect = document.getElementById('priority');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+
+        let isProcessing = false;
+
+        // Focus on textarea when page loads
+        window.addEventListener('load', () => {
+            taskInput.focus();
+        });
+
+        // Keep focus on textarea
+        pasteArea.addEventListener('click', () => {
+            taskInput.focus();
+        });
+
+        // Handle paste event
+        taskInput.addEventListener('paste', (e) => {
+            if (isProcessing) {
+                e.preventDefault();
+                return;
+            }
+
+            // Allow the paste to happen in the textarea so we can read the value
+            setTimeout(() => {
+                const text = taskInput.value;
+                if (text && text.trim()) {
+                    processTasks(text);
+                }
+                // Clear input for next time
+                taskInput.value = '';
+            }, 10);
+        });
+
+        async function processTasks(text) {
+            isProcessing = true;
+            pasteArea.classList.add('active');
+
+            // Parse tasks
+            const tasks = text
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+
+            if (tasks.length === 0) {
+                isProcessing = false;
+                pasteArea.classList.remove('active');
+                return;
+            }
+
+            // Update UI
+            status.textContent = `Creating ${tasks.length} task(s)...`;
+            status.className = "processing";
+            progressBar.style.display = 'block';
+            progressFill.style.width = '50%'; // Indeterminate progress
+
+            const priority = prioritySelect.value;
+
+            // Prepare batch data
+            const batchData = {
+                tasks: tasks.map(name => ({
+                    name: name,
+                    priority: priority
+                }))
+            };
+
+            try {
+                const response = await fetch('/create_batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(batchData)
+                });
+
+                if (response.ok) {
+                    progressFill.style.width = '100%';
+                    status.textContent = `✓ Created ${tasks.length} tasks!`;
+                    status.className = "success";
+
+                    // Reset immediately so user can paste again
+                    setTimeout(() => {
+                        progressBar.style.display = 'none';
+                        progressFill.style.width = '0%';
+                        pasteArea.classList.remove('active');
+                        isProcessing = false;
+                        taskInput.focus();
+                    }, 100); // Just 100ms for visual feedback
+                } else {
+                    throw new Error('Batch creation failed');
+                }
+            } catch (err) {
+                console.error("Error creating tasks:", err);
+                status.textContent = "Error creating tasks.";
+                status.className = "error";
+                isProcessing = false;
+                pasteArea.classList.remove('active');
+            }
+        }
+        // Initialize shutdown handler
+        window.addEventListener('pagehide', () => {
+            if (!isProcessing) {
+                // Use sendBeacon for reliable transmission during unload
+                navigator.sendBeacon('/shutdown');
+            }
+        });
+
+    </script>
+</body>
+
+</html>

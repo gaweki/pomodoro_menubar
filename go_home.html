@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PULANG SEKARANG! 🎉</title>
+    <title>GO HOME NOW! 🎉</title>
     <style>
         * {
             margin: 0;
@@ -30,18 +31,26 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, 
-                #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, 
-                #ffeaa7, #dfe6e9, #ff7675, #a29bfe);
+            background: linear-gradient(45deg,
+                    #ff6b6b, #4ecdc4, #45b7d1, #96ceb4,
+                    #ffeaa7, #dfe6e9, #ff7675, #a29bfe);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             opacity: 0.8;
         }
 
         @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .container {
@@ -62,6 +71,7 @@
                 opacity: 0;
                 transform: scale(0.9);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -76,15 +86,22 @@
         }
 
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-30px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-30px);
+            }
         }
 
         h1 {
             font-size: 80px;
             font-weight: 900;
             color: white;
-            text-shadow: 
+            text-shadow:
                 0 0 10px rgba(255, 255, 255, 0.5),
                 0 0 20px rgba(255, 255, 255, 0.3),
                 4px 4px 8px rgba(0, 0, 0, 0.3);
@@ -94,8 +111,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         .subtitle {
@@ -156,16 +180,21 @@
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0) translateX(0);
                 opacity: 0;
             }
+
             10% {
                 opacity: 0.6;
             }
+
             90% {
                 opacity: 0.6;
             }
+
             100% {
                 transform: translateY(-100vh) translateX(100px);
                 opacity: 0;
@@ -181,6 +210,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Floating particles -->
     <script>
@@ -196,22 +226,22 @@
 
     <div class="container">
         <div class="emoji">🎉</div>
-        <h1>PULANG SEKARANG!</h1>
-        <p class="subtitle">Saatnya istirahat, kerja keras hari ini sudah cukup! 💪</p>
-        
+        <h1>GO HOME NOW!</h1>
+        <p class="subtitle">Time to rest, today's hard work is enough! 💪</p>
+
         <div class="time" id="current-time">18:00:00</div>
-        
+
         <div class="stats">
             <div class="stat-item">
                 <div class="stat-number" id="sessions-count">-</div>
-                <div class="stat-label">Sessions Hari Ini</div>
+                <div class="stat-label">Sessions Today</div>
             </div>
             <div class="stat-item">
                 <div class="stat-number" id="total-minutes">-</div>
-                <div class="stat-label">Menit Fokus</div>
+                <div class="stat-label">Focus Minutes</div>
             </div>
         </div>
-        
+
         <p class="motivational">"Work hard, rest harder! See you tomorrow! 🌟"</p>
     </div>
 
@@ -224,7 +254,7 @@
             const seconds = String(now.getSeconds()).padStart(2, '0');
             document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
         }
-        
+
         updateClock();
         setInterval(updateClock, 1000);
 
@@ -233,21 +263,24 @@
             try {
                 const response = await fetch('session_logs.json');
                 const data = await response.json();
-                
+
                 // Get today's date
                 const today = new Date().toISOString().split('T')[0];
-                
-                // Filter sessions from today
+
+                // Filter sessions from today AND exclude short sessions (< 1 minute)
                 const todaySessions = data.sessions.filter(session => {
-                    return session.start_time.startsWith(today);
+                    return session.start_time.startsWith(today) && (session.duration_minutes || 0) > 0;
                 });
-                
-                // Calculate stats
-                const sessionCount = todaySessions.length;
+
+                // Count UNIQUE session numbers
+                // Example: If we have multiple "Session 1" logs, count as 1
+                const uniqueSessionNumbers = new Set(todaySessions.map(s => s.session_number));
+                const sessionCount = uniqueSessionNumbers.size;
+
                 const totalMinutes = todaySessions.reduce((sum, session) => {
                     return sum + (session.duration_minutes || 0);
                 }, 0);
-                
+
                 // Update display
                 document.getElementById('sessions-count').textContent = sessionCount;
                 document.getElementById('total-minutes').textContent = totalMinutes;
@@ -257,8 +290,15 @@
                 document.getElementById('total-minutes').textContent = '0';
             }
         }
-        
+
         loadStats();
+
+        // Initialize shutdown handler
+        window.addEventListener('pagehide', function () {
+            navigator.sendBeacon('/shutdown');
+        });
     </script>
 </body>
+
 </html>
+```

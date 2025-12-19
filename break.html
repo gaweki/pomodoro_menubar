@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Break Time</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Subtle gradient overlay */
+        .subtle-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(30, 30, 35, 0.5), transparent 60%);
+            z-index: 0;
+        }
+
+        /* Minimal breathing indicator */
+        .breathing-circle {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 3;
+            animation: breathe 6s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.5;
+            }
+        }
+
+        /* Content */
+        .content {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            opacity: 0.6;
+        }
+
+        .time {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            opacity: 0.75;
+        }
+
+        .subtitle {
+            font-size: 0.7rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            opacity: 0.45;
+            margin-top: 1rem;
+            text-transform: uppercase;
+        }
+
+        /* Breathing guide - very subtle */
+        .breathing-guide {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            animation: breathingText 6s ease-in-out infinite;
+        }
+
+        @keyframes breathingText {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Close button - minimal */
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Fullscreen toggle - minimal */
+        .fullscreen-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 0.85rem;
+        }
+
+        .fullscreen-toggle:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Close Button -->
+    <div class="close-btn" id="closeBtn" title="Close">×</div>
+
+    <!-- Fullscreen Toggle -->
+    <div class="fullscreen-toggle" id="fullscreenToggle" title="Toggle Fullscreen">⛶</div>
+
+    <!-- Subtle Gradient -->
+    <div class="subtle-gradient"></div>
+
+    <!-- Breathing Circle -->
+    <div class="breathing-circle"></div>
+
+    <!-- Content -->
+    <div class="content">
+        <h1>Break</h1>
+        <div class="time" id="timeDisplay">05:00</div>
+        <p class="subtitle">Breathe • Stretch • Hydrate</p>
+    </div>
+
+    <!-- Breathing Guide -->
+    <div class="breathing-guide" id="breathingGuide">Inhale</div>
+
+    <script>
+        // Entertainment URLs for stress relief (visual only, no sound required)
+        const entertainmentURLs = [
+            'https://paveldogreat.github.io/WebGL-Fluid-Simulation/',
+            'https://www.pixelthoughts.co/',
+            'http://www.koalastothemax.com/',  // Satisfying circle division
+            'https://slither.io/',
+            'https://gabrielecirulli.github.io/2048/',
+            'https://theuselessweb.com/',
+            'https://29a.ch/sandbox/2011/neonflames/',  // Draw glowing trails
+            'https://zoomquilt.org/',  // Infinite zoom art
+            'https://slowroads.io/',  // Scenic drive simulator
+            'https://musiclab.chromeexperiments.com/Song-Maker/', // Make music
+            'https://spielzeugz.de/html5/liquid-particles.html', // Interactive particles
+            'https://quickdraw.withgoogle.com/', // AI drawing game
+            'https://neal.fun/spend/', // Bill Gates money
+            'https://sandspiel.club/', // Falling sand game
+            'https://thisissand.com/', // Sand art
+            'https://radio.garden/', // Global radio
+        ];
+
+        // Get visited URLs from localStorage
+        function getVisitedURLs() {
+            const visited = localStorage.getItem('visitedEntertainment');
+            return visited ? JSON.parse(visited) : [];
+        }
+
+        // Save visited URLs to localStorage
+        function saveVisitedURLs(urls) {
+            localStorage.setItem('visitedEntertainment', JSON.stringify(urls));
+        }
+
+        // Get next random URL without repetition
+        function getNextRandomURL() {
+            let visited = getVisitedURLs();
+
+            // Reset if all URLs have been visited
+            if (visited.length >= entertainmentURLs.length) {
+                visited = [];
+                saveVisitedURLs(visited);
+            }
+
+            // Get unvisited URLs
+            const unvisited = entertainmentURLs.filter(url => !visited.includes(url));
+
+            // Pick random from unvisited
+            const randomURL = unvisited[Math.floor(Math.random() * unvisited.length)];
+
+            // Mark as visited
+            visited.push(randomURL);
+            saveVisitedURLs(visited);
+
+            return randomURL;
+        }
+
+        // Auto-open random entertainment page in new tab after 2 seconds
+        setTimeout(() => {
+            const randomURL = getNextRandomURL();
+            window.open(randomURL, '_blank');
+            console.log('Opened entertainment:', randomURL);
+        }, 2000); // 2 seconds
+
+        // Get duration from URL parameter (default to 5 minutes)
+        const urlParams = new URLSearchParams(window.location.search);
+        const durationMinutes = parseInt(urlParams.get('duration')) || 5;
+
+        // Timer countdown
+        let timeRemaining = durationMinutes * 60;
+        const timeDisplay = document.getElementById('timeDisplay');
+
+        function updateTimer() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            if (timeRemaining > 0) {
+                timeRemaining--;
+            } else {
+                // Close window when timer ends
+                window.close();
+            }
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // Breathing guide text animation
+        const breathingGuide = document.getElementById('breathingGuide');
+        let breathingPhase = 0;
+
+        setInterval(() => {
+            breathingPhase = (breathingPhase + 1) % 2;
+            breathingGuide.textContent = breathingPhase === 0 ? 'Inhale' : 'Exhale';
+        }, 3000);
+
+        // Close button
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            window.close();
+        });
+
+        // Fullscreen logic
+        const toggleBtn = document.getElementById('fullscreenToggle');
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log("Fullscreen not available");
+                    });
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        toggleBtn.addEventListener('click', toggleFullscreen);
+
+        // ESC key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                window.close();
+            }
+        });
+
+        // Start animation loop
+        // animate(); // Assuming 'animate' function is defined elsewhere or will be added.
+
+        // Initialize shutdown handler
+        window.addEventListener('pagehide', function () {
+            navigator.sendBeacon('/shutdown');
+        });
+    </script>
+</body>
+
+</html>
+```
