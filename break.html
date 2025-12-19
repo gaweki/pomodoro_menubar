@@ -296,9 +296,30 @@
             breathingGuide.textContent = breathingPhase === 0 ? 'Inhale' : 'Exhale';
         }, 3000);
 
+        // Prevent accidental closing for the first 10 seconds
+        let protectionActive = true;
+        setTimeout(() => {
+            protectionActive = false;
+        }, 10000); // 10 seconds
+
+        window.addEventListener('beforeunload', (e) => {
+            if (protectionActive) {
+                // Cancel the event
+                e.preventDefault();
+                // Chrome requires returnValue to be set
+                e.returnValue = 'Break time just started. Are you sure you want to skip it?';
+            }
+        });
+
         // Close button
         document.getElementById('closeBtn').addEventListener('click', () => {
-            window.close();
+            if (protectionActive) {
+                if (confirm("Break just started! Are you sure you want to skip it already?")) {
+                    window.close();
+                }
+            } else {
+                window.close();
+            }
         });
 
         // Fullscreen logic
