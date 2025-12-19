@@ -3557,7 +3557,13 @@ class PomodoroMenuBarApp(rumps.App):
             
             # New work session started
             if activity and activity.get('type') == 'WORK':
-                self.session_start_time = now
+                # CRITICAL FIX: Do not auto-start timer if system is locked/sleeping
+                if self._paused_for_sleep:
+                     print(f"😴 New session started ({activity.get('session')}) but system is SLEEPING. Timer will remain paused.")
+                     self.session_start_time = None # Explicitly ensure no timer is running
+                else:
+                    self.session_start_time = now
+                
                 self._task_switched_once = False # Reset flag for new session
                 
                 # Activate queued task if exists
