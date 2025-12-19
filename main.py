@@ -440,6 +440,43 @@ SCHEDULE = [
     {"session": 9, "type": "WORK", "start": "17:20", "end": "17:45"},
     {"session": 9, "type": "SHORT_BREAK", "start": "17:45", "end": "17:50"},
     {"session": 10, "type": "WORK", "start": "17:50", "end": "18:00"},
+    {"session": 10, "type": "SHORT_BREAK", "start": "18:00", "end": "18:02"},
+    {"session": 11, "type": "WORK", "start": "18:02", "end": "18:12"},
+    {"session": 11, "type": "SHORT_BREAK", "start": "18:12", "end": "18:13"},
+    {"session": 12, "type": "WORK", "start": "18:13", "end": "18:23"},
+    {"session": 12, "type": "SHORT_BREAK", "start": "18:23", "end": "18:24"},
+    {"session": 13, "type": "WORK", "start": "18:24", "end": "18:34"},
+    {"session": 13, "type": "SHORT_BREAK", "start": "18:34", "end": "18:35"},
+    {"session": 14, "type": "WORK", "start": "18:35", "end": "18:45"},
+    {"session": 14, "type": "SHORT_BREAK", "start": "18:45", "end": "18:46"},
+    {"session": 15, "type": "WORK", "start": "18:46", "end": "18:56"},
+    {"session": 15, "type": "SHORT_BREAK", "start": "18:56", "end": "18:57"},
+    {"session": 16, "type": "WORK", "start": "18:57", "end": "19:00"},
+    {"session": 16, "type": "SHORT_BREAK", "start": "19:00", "end": "19:02"},
+    {"session": 17, "type": "WORK", "start": "19:02", "end": "19:12"},
+    {"session": 17, "type": "SHORT_BREAK", "start": "19:12", "end": "19:13"},
+    {"session": 18, "type": "WORK", "start": "19:13", "end": "19:23"},
+    {"session": 18, "type": "SHORT_BREAK", "start": "19:23", "end": "19:24"},
+    {"session": 19, "type": "WORK", "start": "19:24", "end": "19:34"},
+    {"session": 19, "type": "SHORT_BREAK", "start": "19:34", "end": "19:35"},
+    {"session": 20, "type": "WORK", "start": "19:35", "end": "19:45"},
+    {"session": 20, "type": "SHORT_BREAK", "start": "19:45", "end": "19:46"},
+    {"session": 21, "type": "WORK", "start": "19:46", "end": "19:56"},
+    {"session": 21, "type": "SHORT_BREAK", "start": "19:56", "end": "19:57"},
+    {"session": 22, "type": "WORK", "start": "19:57", "end": "20:00"},
+    {"session": 22, "type": "SHORT_BREAK", "start": "20:00", "end": "20:02"},
+    {"session": 23, "type": "WORK", "start": "20:02", "end": "20:12"},
+    {"session": 23, "type": "SHORT_BREAK", "start": "20:12", "end": "20:13"},
+    {"session": 24, "type": "WORK", "start": "20:13", "end": "20:23"},
+    {"session": 24, "type": "SHORT_BREAK", "start": "20:23", "end": "20:24"},
+    {"session": 25, "type": "WORK", "start": "20:24", "end": "20:34"},
+    {"session": 25, "type": "SHORT_BREAK", "start": "20:34", "end": "20:35"},
+    {"session": 26, "type": "WORK", "start": "20:35", "end": "20:45"},
+    {"session": 26, "type": "SHORT_BREAK", "start": "20:45", "end": "20:46"},
+    {"session": 27, "type": "WORK", "start": "20:46", "end": "20:56"},
+    {"session": 27, "type": "SHORT_BREAK", "start": "20:56", "end": "20:57"},
+    {"session": 28, "type": "WORK", "start": "20:57", "end": "21:00"},
+    {"session": 28, "type": "SHORT_BREAK", "start": "21:00", "end": "21:02"},
 ]
 
 # Dynamic schedule for manual start (generated on-the-fly)
@@ -879,6 +916,11 @@ class SessionLogger:
     
     def log_session(self, session_data):
         """Log a new session"""
+        # Skip logging if no task is selected
+        if session_data.get('task_id') == 'no-task' or session_data.get('task_name') == '(No Task)':
+            print("⏭️ Skipping session log: No task selected")
+            return None
+        
         session = {
             'id': str(uuid.uuid4()),
             **session_data,
@@ -1972,14 +2014,22 @@ class PomodoroMenuBarApp(rumps.App):
             print("ℹ️ No sleep-paused session to resume")
     
     def is_within_schedule_hours(self):
-        """Check if current time is within schedule hours (09:00-18:00 weekdays)"""
+        """Check if current time is within schedule hours defined in SCHEDULE"""
         now = datetime.now()
         # Weekend = outside schedule
         if now.weekday() >= 5:
             return False
-        # Check time
-        current_hour = now.hour
-        return 9 <= current_hour < 18
+            
+        current_time_str = now.strftime("%H:%M")
+        
+        # Get dynamic bounds from SCHEDULE
+        if not SCHEDULE:
+            return False
+            
+        start_bounds = [item["start"] for item in SCHEDULE]
+        end_bounds = [item["end"] for item in SCHEDULE]
+        
+        return min(start_bounds) <= current_time_str < max(end_bounds)
     
     def toggle_manual_timer(self, _):
         """Start or stop manual Pomodoro timer using dynamic schedule"""
@@ -2273,11 +2323,6 @@ class PomodoroMenuBarApp(rumps.App):
         self.update_task_display()
         self.update_timer(None)
 
-        
-        # Start timer
-        self.timer = rumps.Timer(self.update_timer, 1)
-        self.timer.start()
-
     def _run_server(self):
         """Run the local HTTP server"""
         try:
@@ -2446,16 +2491,7 @@ class PomodoroMenuBarApp(rumps.App):
             # 1. Get raw seconds stats efficiently (Single source of truth)
             today_seconds = self.analytics.get_today_task_seconds()
             
-            # 2. Setup logic for urgent icon
-            show_urgent_icon = False
-            global DYNAMIC_SCHEDULE_ACTIVE
             current_activity = get_current_activity()
-            
-            # Check conditions: Fixed Schedule AND Session >= 7
-            if not DYNAMIC_SCHEDULE_ACTIVE and current_activity:
-                sess_num = current_activity.get('session')
-                if isinstance(sess_num, int) and sess_num >= 7:
-                    show_urgent_icon = True
 
             # Helper to create callback
             def make_callback(t):
@@ -2467,37 +2503,22 @@ class PomodoroMenuBarApp(rumps.App):
             low = [t for t in tasks if t['priority'] == 'Low']
             
             def format_task_label(t):
-                # Get raw seconds for this task
+                # Get raw seconds for this task from session logs only
                 total_secs = today_seconds.get(t['name'], 0)
-                
-                # Add real-time seconds if this is the active task being worked on
-                if self.current_task and t['name'] == self.current_task['name']:
-                    # Check if actually in WORK session
-                    curr_activity = get_current_activity()
-                    if curr_activity and curr_activity.get('type') == 'WORK':
-                        # Calculate elapsed seconds for current session
-                        now_dt = datetime.now()
-                        start_time_str = curr_activity.get('start', '00:00')
-                        s_h, s_m = map(int, start_time_str.split(':'))
-                        start_session_dt = now_dt.replace(hour=s_h, minute=s_m, second=0, microsecond=0)
-                        elapsed_realtime = max(0, (now_dt - start_session_dt).total_seconds())
-                        total_secs += elapsed_realtime
+
+                # Round total seconds to avoid float precision issues in display
+                total_secs = round(total_secs, 0)
 
                 # Format duration string manually to avoid extra calls
-                h = total_secs // 3600
-                m = (total_secs % 3600) // 60
-                s = total_secs % 60
+                h = int(total_secs // 3600)
+                m = int((total_secs % 3600) // 60)
+                s = int(total_secs % 60)
                 
                 if h > 0: duration_str = f"{h}h {m}m {s}s"
                 elif m > 0: duration_str = f"{m}m {s}s"
                 else: duration_str = f"{int(s)}s"
                 if total_secs == 0: duration_str = "0m"
 
-                # Logic for "urgent" icon
-                prefix = ""
-                if show_urgent_icon:
-                    if total_secs < 20 * 60: # Less than 20 minutes
-                         prefix = "⚡ " 
                 
                 # Add repeat info if available
                 repeat_num = t.get('repeat_number')
@@ -2524,7 +2545,7 @@ class PomodoroMenuBarApp(rumps.App):
                     day_str = ""
                 
                 # return f"[{t['priority'][0]}] {t['name']} ({duration_str}){repeat_str}{day_str}"
-                return f"{prefix}{t['name']} ({duration_str})"
+                return f"{t['name']} ({duration_str})"
 
             # High
             if high:
@@ -3618,13 +3639,16 @@ class PomodoroMenuBarApp(rumps.App):
                     self.prompt_feedback_during_break()
                     self.feedback_shown_this_break = True
         
-        # Check for end of work day (18:00) - open GO HOME page
-        if now.hour == 18 and now.minute == 0:
-            today_date = now.date()
-            if self.last_go_home_date != today_date:
-                self.last_go_home_date = today_date
-                self.open_go_home_page()
-                self.reset_app_state()  # Reset state when workday ends
+        # Check for end of work day - open GO HOME page (dynamic based on SCHEDULE)
+        if SCHEDULE:
+            last_schedule_end = SCHEDULE[-1]["end"]  # e.g., "21:02"
+            end_hour, end_minute = map(int, last_schedule_end.split(":"))
+            if now.hour == end_hour and now.minute == end_minute:
+                today_date = now.date()
+                if self.last_go_home_date != today_date:
+                    self.last_go_home_date = today_date
+                    self.open_go_home_page()
+                    self.reset_app_state()  # Reset state when workday ends
         
         # Check for date change to refresh menu (reset daily stats)
         if self.last_menu_date != now.date():
@@ -3644,99 +3668,56 @@ class PomodoroMenuBarApp(rumps.App):
             # Weekend or outside work hours
             if now.weekday() >= 5:
                 self.title = "🏖️"
-                # self.session_info.title = "Weekend - Enjoy!"
             else:
                 self.title = "⏸️"
-                # self.session_info.title = "Outside work hours"
             
             self.time_info.title = "No active session"
-            # self.progress_info.title = "Progress: --"  # Temporarily hidden
             self.next_info.title = f"Next: {self.find_next_activity()}"
             self.task_info.title = "No task selected"
         else:
-            # Calculate ELAPSED time (count UP)
+            # Calculate time
             start_time = datetime.strptime(activity["start"], "%H:%M").time()
             end_time = datetime.strptime(activity["end"], "%H:%M").time()
 
             start_dt = now.replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0)
             end_dt = now.replace(hour=end_time.hour, minute=end_time.minute, second=0, microsecond=0)
 
-            total_timedelta = end_dt - start_dt
-            elapsed_timedelta = now - start_dt
-            remaining_timedelta = end_dt - now
+            total_seconds = (end_dt - start_dt).total_seconds()
+            elapsed_seconds = (now - start_dt).total_seconds()
+            remaining_seconds = (end_dt - now).total_seconds()
 
-            total_seconds = total_timedelta.total_seconds()
-            elapsed_seconds = elapsed_timedelta.total_seconds()
-            remaining_seconds = remaining_timedelta.total_seconds()
+            # Ensure values are within bounds
+            elapsed_seconds = max(0, min(elapsed_seconds, total_seconds))
+            percentage = (elapsed_seconds / total_seconds) * 100 if total_seconds > 0 else 0
+            
+            # Display time
+            mins = int(elapsed_seconds) // 60
+            secs = int(elapsed_seconds) % 60
 
-            if remaining_seconds >= 0:
-                # Calculate percentage based on ELAPSED time (count up)
-                percentage = (elapsed_seconds / total_seconds) * 100 if total_seconds > 0 else 0
-                
-                # Display ELAPSED time (count up)
-                mins = int(elapsed_seconds) // 60
-                secs = int(elapsed_seconds) % 60
+            type_str = activity["type"]
+            session = activity["session"]
+            emoji, label = self.get_emoji_and_label(type_str)
 
-                # Get emoji and label
-                type_str = activity["type"]
-                session = activity["session"]
-                emoji, label = self.get_emoji_and_label(type_str)
-
-                # Update menu bar title with task name
-                if type_str == "WORK":
-                    urgent_marker = ""
-                    if not DYNAMIC_SCHEDULE_ACTIVE and isinstance(session, int) and session >= 7:
-                        today_seconds = self.analytics.get_today_task_seconds()
-                        
-                        # Trigger refresh when current task crosses 20m mark
-                        if self.current_task:
-                            past_secs = today_seconds.get(self.current_task['name'], 0)
-                            if past_secs < 1200 and (past_secs + elapsed_seconds) >= 1200:
-                                if not self.urgent_refresh_done:
-                                    self.refresh_tasks_submenu()
-                                    self.urgent_refresh_done = True
-
-                        available_tasks = self.task_manager.get_available_tasks()
-                        for t in available_tasks:
-                            secs_worked = today_seconds.get(t['name'], 0)
-                            # Key fix: Account for real-time progress for current task 
-                            if self.current_task and t['name'] == self.current_task['name']:
-                                secs_worked += elapsed_seconds
-
-                            if secs_worked < 1200: # 20 minutes
-                                urgent_marker = "⚡ "
-                                break
-
-                    if self.current_task:
-                        task_name = self.current_task['name']
-                        # Truncate task name if too long
-                        if len(task_name) > 15:
-                            task_name = task_name[:12] + "..."
-                        # self.title = f"{mins:02d}:{secs:02d} · {task_name}"
-                        self.title = f"{urgent_marker}WORK - {task_name} - {activity['end']}"
-                    else:
-                        self.title = f"{urgent_marker}{mins:02d}:{secs:02d} · 🔘📝"
+            # Update menu bar title
+            if type_str == "WORK":
+                if self.current_task:
+                    task_name = self.current_task['name']
+                    if len(task_name) > 15:
+                        task_name = task_name[:12] + "..."
+                    self.title = f"WORK - {task_name} - {activity['end']}"
                 else:
-                    self.title = f"{emoji} · {mins:02d}:{secs:02d}"
+                    self.title = f"{mins:02d}:{secs:02d} · 🔘📝"
+            else:
+                self.title = f"{emoji} · {mins:02d}:{secs:02d}"
 
-                # Update menu items
-                period = "Morning" if activity["start"] < "12:00" else ("Lunch" if type_str == "LUNCH" else "Afternoon")
-                # self.session_info.title = f"[{period}] Session {session} - {label} ({activity['start']} - {activity['end']})"
-                # self.time_info.title = ... (Merged into session info)
-                
-                # Progress bar (count up)
-                progress_bar = self.create_progress_bar(percentage)
-                # self.progress_info.title = f"Progress: {progress_bar} {percentage:.0f}%"  # Temporarily hidden
-                
-                # Next activity
-                self.next_info.title = f"Next: {self.find_next_activity()}"
-                
-                # Update task display with start time if in WORK session
-                time_str = None
-                if type_str == "WORK" and self.session_start_time:
-                    time_str = self.session_start_time.strftime("%H:%M:%S")
-                
-                self.update_task_display(time_str)
+            # Update info items
+            self.next_info.title = f"Next: {self.find_next_activity()}"
+            
+            # Update task display
+            time_str = None
+            if type_str == "WORK" and self.session_start_time:
+                time_str = self.session_start_time.strftime("%H:%M:%S")
+            self.update_task_display(time_str)
 
 
 if __name__ == "__main__":
