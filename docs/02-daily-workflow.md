@@ -8,12 +8,12 @@ PomodoroWork operates on a **fixed schedule** during weekdays (Monday–Friday).
 |--------|------|----------|---------|
 | Morning | 09:00 – 12:00 | 1 – 6 | 25m Work / 5m Break (Long break after Session 4) |
 | Lunch | 12:00 – 13:00 | — | 60m Break |
-| Afternoon | 13:00 – 18:00 | 1 – 10 | 25m Work / 5m Break (Long breaks after Sessions 4 & 8) |
+| Afternoon & Evening | 13:00 – End | 1 – 28+ | 25m Work / 5m Break (Cycles continue based on `SCHEDULE`) |
 
 ### How it works:
 - **Zero-Touch Transitions:** You don't need to press "Start" or "Stop." The app constantly checks the system clock and shifts to the correct activity (WORK/BREAK/LUNCH) based on the table above.
-- **Session Numbers:** These are primarily used for logging and tracking. In the afternoon, **Session 7 and above (starting at 16:10)** are special—they trigger **Urgent Mode** for tasks with low focus time (see [Phase 5](05-advanced-features.md)).
-- **Customizable:** If your workday starts early or ends late, you can define your own schedule by editing the `SCHEDULE` list in `main.py` (around line 406).
+- **Session Numbers:** Used for logging and tracking. Each session is recorded in your history for analytics.
+- **Customizable:** Your workday schedule is fully flexible. You can define your own start times, end times, and break durations by editing the `SCHEDULE` list in `main.py` (around line 406).
 
 > **Note:** Session numbers reset after lunch. "Session 7" in the afternoon begins at 16:10.
 
@@ -22,11 +22,11 @@ PomodoroWork operates on a **fixed schedule** during weekdays (Monday–Friday).
 The app behaves differently depending on the time of day and your manual input:
 
 ### 1. Automatic Mode (Fixed Schedule)
-- **Time:** Weekdays (Mon-Fri), 09:00 – 18:00.
+- **Time:** Weekdays (Mon-Fri), during scheduled hours.
 - **Workflow:** You don't need to start anything. Just select a task. The app moves through work/break sessions automatically based on the clock.
 
 ### 2. Manual Mode (Dynamic Schedule)
-- **Time:** Outside work hours (Early morning, Nights, Weekends).
+- **Time:** Outside scheduled hours (Early morning, Nights, Weekends).
 - **Workflow:** You must click **▶️ Start Pomodoro**. The app then generates a custom schedule (25m work/5m break) starting from that moment.
 
 ### How they interact (Priority):

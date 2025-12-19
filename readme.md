@@ -12,8 +12,7 @@ A **macOS menu bar** Pomodoro timer with task management, session logging, web-b
 - **Session logging** to `session_logs.json` with detailed analytics
 - **Statistics menu** with daily/weekly summaries, mood analysis, and task duration breakdowns
 - **Automated Fixed Schedule** - Morning (09:00-12:00) and Afternoon (13:00-18:00) sessions with predefined work/break cycles.
-- **Urgent Task Indicator (⚡)** - Automatically identifies and flags tasks with less than 20 minutes of focus time during afternoon periods (`session_number >= 7`, starting from 16:10).
-- **End-of-day page** - at 18:00 opens `go_home.html` with animated UI and real-time daily stats injection.
+- **End-of-day page** - automatically opens `go_home.html` at the end of the scheduled workday.
 - **Zen Mode** - fullscreen break interface (`break.html`) with calming animations and stress-relief links.
 - **Off-Hours Mode** - Dynamic schedule generation for manual work sessions outside 9-5.
 - **Smart Sleep Detection** - Automatically saves session and pauses timer when computer sleeps or locks.
@@ -136,11 +135,11 @@ The application follows a structured workday. It automatically switches activiti
 | :--- | :--- | :--- | :--- |
 | **Morning** | 09:00 - 12:00 | 1 - 6 | 25m Work / 5m Break (Long break after session 4) |
 | **Lunch** | 12:00 - 13:00 | - | 60m Break |
-| **Afternoon** | 13:00 - 16:10 | 1 - 6 | 25m Work / 5m Break (Long break after session 4) |
-| **Urgent Mode** | 16:10 - 18:00 | **7 - 10** | ⚡ Flags tasks with < 20m total work today |
+| **Afternoon & Evening** | 13:00 - End | 1 - 28+ | 25m Work / 5m Break (Cycles continue based on `SCHEDULE`) |
 
-*   **Session 7+ (16:10 onwards):** The "Urgent" (⚡) logic activates. It helps ensure you hit the minimum 20-minute daily goal for all available tasks before the workday ends.
+*   **Fixed Schedule:** The app follows the `SCHEDULE` list defined in `main.py`.
 *   **Off-Hours:** Outside these times (or on weekends), the app defaults to **Manual Mode**.
+
 
 > **💡 Customizing the Schedule:** You can modify the `SCHEDULE` list at the beginning of `main.py` to match your own work hours and break preferences. Simply update the `start` and `end` times for each session.
 
@@ -164,8 +163,7 @@ The application follows a structured workday. It automatically switches activiti
 1. Click menu bar icon → **📝 Select Task** → select priority group → choose a task
 2. Work session starts automatically based on schedule
 3. Menu bar displays task name, priority, and elapsed time.
-4. **Urgent Indicator (⚡):** If `session_number` is 7 or higher (after 16:10) and a task has less than 20 minutes logged today, a ⚡ icon appears in the menu bar and task list.
-5. Task list shows total time spent today (e.g. `(38m 27s)`), updating in real-time.
+4. Task list shows total time spent today (e.g. `(38m 27s)`), updating in real-time.
 *Note: If your Mac goes to sleep or locks, the current session is saved immediately and the timer resets.*
 
 ### Off-Hours / Manual Mode

@@ -54,7 +54,6 @@ Use this feature when you have finished a task for the day, even if you spent le
 
 ### Smart Behavior:
 - **Auto-Logging:** If you mark a task as complete **while it is currently active**, the app will automatically log your elapsed focus time as a finished session before clearing the task from the menu bar.
-- **Urgent Mode Fix:** This is the primary way to remove the ⚡ icon early. If a task is flagged as "Urgent" but you've already finished it, marking it complete will hide the task and the icon immediately.
 - **One-Time Tasks:** If a task has no repeat schedule, marking it complete will **permanently delete** it (since it's no longer needed).
 
 ---
