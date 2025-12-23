@@ -39,6 +39,20 @@ If this app helps you focus, please ⭐ [**star the repo**](https://github.com/g
 - **Auto-Refreshing Menu** - Menu items and durations update in real-time without needing an app restart.
 - **Runs as LaunchAgent** - starts automatically on login.
 
+## 🎬 Demo Videos
+
+### 1. Seamless Task Selection
+Easily select your next focus directly from the menu bar. If you haven't selected a task, PomodoroWork gently reminds you.
+[![](https://img.shields.io/badge/Watch-Task%20Selection%20Demo-blue?style=for-the-badge&logo=apple)](videos/videofromnotasktoselecttask.mov)
+
+### 2. The Great Transition (Zen Mode)
+Watch how PomodoroWork helps you disconnect by automatically opening the Zen Mode fullscreen interface when your session ends.
+[![](https://img.shields.io/badge/Watch-Break%20Transition%20Demo-green?style=for-the-badge&logo=apple)](videos/videowhilechangeintobreaksession.mov)
+
+### 3. Reflection & Mindfulness
+Capture your thoughts and blockers during breaks to maintain high-quality focus throughout the day.
+[![](https://img.shields.io/badge/Watch-Reflection%20Input%20Demo-orange?style=for-the-badge&logo=apple)](videos/videowhileinputreflectiononbreak.mov)
+
 ## 📸 Screenshots
 
 ### Menu Bar Interface
