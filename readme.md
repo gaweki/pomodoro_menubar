@@ -52,6 +52,9 @@ Watch how PomodoroWork helps you disconnect by automatically opening the Zen Mod
 ### 3. Reflection & Mindfulness
 Capture your thoughts and blockers during breaks to maintain high-quality focus throughout the day.
 ![Reflection Input Demo](videos/videowhileinputreflectiononbreak.gif)
+### 4. Flexible Dynamic Scheduling
+Need to start working outside your regular hours? Fire up a dynamic session with a single click and let the app handle the rest.
+![Dynamic Schedule Demo](videos/videostartpomodoroondynamicschedule.gif)
 
 ## 📸 Screenshots
 
