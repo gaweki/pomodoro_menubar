@@ -19,7 +19,7 @@ If this app helps you focus, please ⭐ [**star the repo**](https://github.com/g
 *   **Off-Hours Flexibility** – One-click manual sessions for deep work anytime, even outside your normal schedule.
 
 ### 🔽 Quick Download (Recommended)
-[Download v1.0.2 (Source Code .zip)](https://github.com/gaweki/pomodoro_menubar/archive/refs/tags/v1.0.2.zip)
+[Download Latest Release (Source Code .zip)](https://github.com/gaweki/pomodoro_menubar/releases/latest)
 *(Note: Requires Python to run)*
 
 ## ✨ Features
