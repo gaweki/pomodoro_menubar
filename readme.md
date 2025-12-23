@@ -5,7 +5,7 @@ A **macOS menu bar** Pomodoro timer with task management, session logging, web-b
 ### Why PomodoroWork?
 PomodoroWork is built for those who value both their deep work and their peace of mind. It stays quietly in your menu bar, honoring your focus by staying out of the way while gently guiding you through a rhythm of intentional work and necessary rest. It’s not just about getting things done; it’s about ending your day with a sense of clarity, knowing exactly where your energy went.
 
-If this app helps you focus, please ⭐ [**star the repo**](https://github.com/gaweki/pomodoro_menubar) and share it with a friend. It really helps the project grow!
+If this app helps you focus, please support the project: [![GitHub stars](https://img.shields.io/github/stars/gaweki/pomodoro_menubar?style=social)](https://github.com/gaweki/pomodoro_menubar) and share it with a friend. It really helps the project grow!
 
 ### Core Benefits:
 *   **Stays in your menu bar** – Keeps your workspace clean and minimizes distractions.
