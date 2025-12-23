@@ -2,6 +2,26 @@
 
 A **macOS menu bar** Pomodoro timer with task management, session logging, web-based task editor, and analytics.
 
+### Why PomodoroWork?
+PomodoroWork is built for those who value both their deep work and their peace of mind. It stays quietly in your menu bar, honoring your focus by staying out of the way while gently guiding you through a rhythm of intentional work and necessary rest. It’s not just about getting things done; it’s about ending your day with a sense of clarity, knowing exactly where your energy went.
+
+If this app helps you focus, please ⭐ [**star the repo**](https://github.com/gaweki/pomodoro_menubar) and share it with a friend. It really helps the project grow!
+
+### Core Benefits:
+*   **Stays in your menu bar** – Keeps your workspace clean and minimizes distractions.
+*   **Force break with Zen Mode** – A beautiful fullscreen interface that helps you truly disconnect during breaks.
+*   **Deep Focus Analytics** – Track exactly where your time goes and monitor your productivity and mood over time.
+*   **Autopilot Scheduling** – Automatically follows your scheduled workday without needing to start sessions manually.
+*   **Recurring Habit System** – Tasks can repeat daily, weekly, or on specific weekdays to help build long-term routines.
+*   **Mood & Reflection Journaling** – Log how you feel and what blocked your progress to improve focus quality.
+*   **Smart Task Queueing** – Plan your next move during breaks so you can hit the ground running when the timer starts.
+*   **Batch Mode** – Quickly add multiple tasks at once via copy-paste to streamline your planning.
+*   **Off-Hours Flexibility** – One-click manual sessions for deep work anytime, even outside your normal schedule.
+
+### 🔽 Quick Download (Recommended)
+[Download v1.0.2 (Source Code .zip)](https://github.com/gaweki/pomodoro_menubar/archive/refs/tags/v1.0.2.zip)
+*(Note: Requires Python to run)*
+
 ## ✨ Features
 
 - **Menu bar timer** showing elapsed time, emoji, priority badge, and progress bar
@@ -33,7 +53,16 @@ A **macOS menu bar** Pomodoro timer with task management, session logging, web-b
 ![Zen Mode](screenshots/zen_mode.png)
 *Fullscreen break interface with calming animations*
 
+
+
 ## 📦 Installation
+
+### 🚀 Quick Start (Automation)
+If you already have Python installed, you can use the included `manual.sh` script which handles setup and dependency installation automatically:
+```bash
+chmod +x manual.sh
+./manual.sh
+```
 
 ### 1. Prerequisite
 Ensure you have Python 3.9+ installed on your macOS.
@@ -64,14 +93,15 @@ chmod +x main.py
 ```
 The timer icon (🍅) should appear in your menu bar.
 
-### Quick Start (Automation)
-Alternatively, you can use the included `manual.sh` script which handles virtual environment creation and dependency installation automatically:
-```bash
-chmod +x manual.sh
-./manual.sh
-```
+
 
 ### 5. Set Up LaunchAgent (Auto-start on Login)
+
+Setting up a LaunchAgent allows the application to run automatically in the background as soon as you log into your Mac.
+
+*   **Why do this?** To ensure your Pomodoro schedule and session tracking are always active without manual intervention. It makes the app truly "set-and-forget."
+*   **Who is it for?** Highly recommended for daily users who want the timer to follow their workday schedule automatically.
+*   **What happens?** The app will start silently on boot/login, and you'll see the 🍅 icon in your menu bar immediately.
 
 **Option A: Using the provided plist file**
 ```bash
@@ -87,7 +117,10 @@ launchctl load ~/Library/LaunchAgents/com.pomodoro.menubar.plist
 
 **Option B: Manual plist creation**
 
-Create `~/Library/LaunchAgents/com.pomodoro.menubar.plist`:
+1. Create a file at `~/Library/LaunchAgents/com.pomodoro.menubar.plist`.
+2. Replace `YOUR_USERNAME` and `PATH_TO_PROJECT` with your actual Mac username and the folder where you cloned the repo.
+3. **Note:** We recommend using the python executable inside your `venv` to ensure dependencies like `rumps` are found.
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -97,15 +130,21 @@ Create `~/Library/LaunchAgents/com.pomodoro.menubar.plist`:
     <string>com.pomodoro.menubar</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/python3</string>
-        <string>/your_path/pomodoro_work/main.py</string>
+        <!-- Path to python inside your virtual environment -->
+        <string>/Users/YOUR_USERNAME/PATH_TO_PROJECT/venv/bin/python3</string>
+        <!-- Path to your main.py file -->
+        <string>/Users/YOUR_USERNAME/PATH_TO_PROJECT/main.py</string>
     </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/YOUR_USERNAME/PATH_TO_PROJECT</string>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardErrorPath</key>
-    <string>/tmp/main.err</string>
+    <string>/tmp/pomodoro_menubar.err</string>
+    <key>StandardOutPath</key>
+    <string>/tmp/pomodoro_menubar.out</string>
 </dict>
 </plist>
 ```
@@ -135,57 +174,19 @@ The application follows a structured workday. It automatically switches activiti
 | :--- | :--- | :--- | :--- |
 | **Morning** | 09:00 - 12:00 | 1 - 6 | 25m Work / 5m Break (Long break after session 4) |
 | **Lunch** | 12:00 - 13:00 | - | 60m Break |
-| **Afternoon & Evening** | 13:00 - End | 1 - 28+ | 25m Work / 5m Break (Cycles continue based on `SCHEDULE`) |
+| **Afternoon & Evening** | 13:00 - End | 1 - 15+ | 25m Work / 5m Break (Cycles continue based on `SCHEDULE`) |
 
 *   **Fixed Schedule:** The app follows the `SCHEDULE` list defined in `main.py`.
 *   **Off-Hours:** Outside these times (or on weekends), the app defaults to **Manual Mode**.
 
 
-> **💡 Customizing the Schedule:** You can modify the `SCHEDULE` list at the beginning of `main.py` to match your own work hours and break preferences. Simply update the `start` and `end` times for each session.
+> **Customizing the Schedule:** You can modify the `SCHEDULE` list at the beginning of `main.py` to match your own work hours and break preferences. Simply update the `start` and `end` times for each session.
 
 ## 🛠️ Configuration
 
 ## ▶️ Usage
 
-### Adding Tasks
-1. Click menu bar icon → **⚙️ Manage Tasks** → **Add New Task**
-2. Browser opens with a web form
-3. Enter task name, priority, and optional repeat schedule
-4. Click **Create Task**
-*Tip: You can also use **Quick Add (Paste)** to add a task from clipboard text.*
-
-### Editing Tasks
-1. Click menu bar icon → **⚙️ Manage Tasks** → **Edit Task** → select priority group → select task
-2. Browser opens with pre-filled form
-3. Modify details and click **Save Changes**
-
-### Working on Tasks
-1. Click menu bar icon → **📝 Select Task** → select priority group → choose a task
-2. Work session starts automatically based on schedule
-3. Menu bar displays task name, priority, and elapsed time.
-4. Task list shows total time spent today (e.g. `(38m 27s)`), updating in real-time.
-*Note: If your Mac goes to sleep or locks, the current session is saved immediately and the timer resets.*
-
-### Off-Hours / Manual Mode
-1. Outside of 09:00-18:00 (or on weekends), click **▶️ Start Pomodoro**
-2. A dynamic schedule (Work 25m / Break 5m) is generated starting from *now*
-3. Continues until you click **⏹️ Stop Pomodoro** or the cycle completes (4 sessions + long break)
-
-### Breaks
-1. Break starts automatically after work session
-2. Zen Mode (`break.html`) opens in browser
-3. After 60 seconds, feedback dialog appears (mood, reflection, blockers)
-4. You can skip or fill in the feedback
-
-### Marking Tasks Complete
-1. Click menu bar icon → **⚙️ Manage Tasks** → **Mark Complete for Today** → select task
-2. Task is marked as completed for the day
-3. For repeating tasks, it will reappear based on schedule
-
-### Viewing Statistics
-- **📊 Statistics** → **Summary** → Daily/Weekly summaries
-- **📊 Statistics** → **Task Duration Stats** → Daily/Weekly/Monthly breakdowns
-- **📊 Statistics** → **Mood Analysis** → Mood trends and patterns
+For detailed information on how to configure the application, schedules, and advanced settings, please refer to the [docs](./docs) directory.
 
 ## 📂 Project Structure
 
@@ -206,9 +207,6 @@ pomodoro_work/
 ## 🧹 Cleanup
 
 ```bash
-# Remove generated files
-rm -f session_logs.json tasks.json
-
 # Remove LaunchAgent
 launchctl unload ~/Library/LaunchAgents/com.pomodoro.menubar.plist
 rm ~/Library/LaunchAgents/com.pomodoro.menubar.plist

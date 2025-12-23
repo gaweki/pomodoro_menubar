@@ -3297,8 +3297,8 @@ class PomodoroMenuBarApp(rumps.App):
 
     def prompt_session_feedback(self):
         """Save session immediately and optionally prompt for feedback later (non-blocking)"""
-        if not self.session_start_time:
-            return  # No session to log
+        if not self.session_start_time or not self.current_task:
+            return  # No session or no task to log
         
         # Calculate actual duration
         end_time = datetime.now()
