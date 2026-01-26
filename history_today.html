@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Session History</title>
+    <style>
+        :root {
+            --bg-color: #1a1b26;
+            --card-bg: #24283b;
+            --text-color: #a9b1d6;
+            --accent-color: #7aa2f7;
+            --border-color: #414868;
+            --success-color: #9ece6a;
+            --danger-color: #f7768e;
+            --warning-color: #e0af68;
+            --work-color: #f7768e;
+            --break-color: #9ece6a;
+            --lunch-color: #e0af68;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .date-display {
+            color: var(--text-color);
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background-color: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .session-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            border-left: 4px solid var(--work-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .session-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .session-card.work {
+            border-left-color: var(--work-color);
+        }
+
+        .session-card.break {
+            border-left-color: var(--break-color);
+        }
+
+        .session-card.lunch {
+            border-left-color: var(--lunch-color);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .session-task {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .session-type {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .session-type.work {
+            background-color: var(--work-color);
+            color: #1a1b26;
+        }
+
+        .session-type.break {
+            background-color: var(--break-color);
+            color: #1a1b26;
+        }
+
+        .session-type.lunch {
+            background-color: var(--lunch-color);
+            color: #1a1b26;
+        }
+
+        .session-details {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .session-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .session-mood {
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .mood-label {
+            opacity: 0.7;
+        }
+
+        .reflection-text {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: var(--accent-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h2 {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-refresh {
+            background-color: var(--accent-color);
+            color: #1a1b26;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-refresh:hover {
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Today's Session History</h1>
+            <div>
+                <span class="date-display" id="dateDisplay"></span>
+                <button class="btn-refresh" onclick="loadSessions()">↻ Refresh</button>
+            </div>
+        </header>
+
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalSessions">-</div>
+                <div class="stat-label">Sessions</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalTime">-</div>
+                <div class="stat-label">Focus Time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="tasksWorked">-</div>
+                <div class="stat-label">Tasks</div>
+            </div>
+        </div>
+
+        <div class="session-list" id="sessionList">
+            <div class="loading">Loading sessions...</div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date
+        const today = new Date();
+        document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        async function loadSessions() {
+            const listContainer = document.getElementById('sessionList');
+            listContainer.innerHTML = '<div class="loading">Loading sessions...</div>';
+
+            try {
+                const response = await fetch('/api/sessions/today');
+                const data = await response.json();
+
+                const sessions = data.sessions || [];
+
+                // Calculate stats
+                const workSessions = sessions.filter(s => s.session_type === 'WORK');
+                const totalMinutes = workSessions.reduce((sum, s) => sum + (s.duration_minutes || 0), 0);
+                const uniqueTasks = new Set(workSessions.map(s => s.task_id).filter(id => id && id !== 'no-task'));
+
+                document.getElementById('totalSessions').textContent = workSessions.length;
+                document.getElementById('totalTime').textContent = `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`;
+                document.getElementById('tasksWorked').textContent = uniqueTasks.size;
+
+                // Render sessions
+                if (sessions.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🍅</div>
+                            <h2>No sessions yet today</h2>
+                            <p>Start a Pomodoro session to begin tracking your focus time.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Sort by start_time descending (newest first)
+                sessions.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+
+                listContainer.innerHTML = sessions.map(session => {
+                    const typeClass = session.session_type?.toLowerCase().includes('break') ? 'break'
+                        : session.session_type === 'LUNCH' ? 'lunch'
+                            : 'work';
+
+                    const startTime = new Date(session.start_time).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    const endTime = session.end_time ? new Date(session.end_time).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : 'ongoing';
+
+                    const duration = session.duration_minutes ? `${session.duration_minutes}m` : '-';
+                    const taskName = session.task_name || '(No Task)';
+
+                    let moodSection = '';
+                    if (session.mood || session.reflection) {
+                        moodSection = `
+                            <div class="session-mood">
+                                ${session.mood ? `<span class="mood-label">Mood:</span> ${session.mood}` : ''}
+                                ${session.reflection ? `<div class="reflection-text">"${session.reflection}"</div>` : ''}
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="session-card ${typeClass}">
+                            <div class="session-header">
+                                <span class="session-task">${taskName}</span>
+                                <span class="session-type ${typeClass}">${session.session_type || 'WORK'}</span>
+                            </div>
+                            <div class="session-details">
+                                <span>🕐 ${startTime} - ${endTime}</span>
+                                <span>⏱️ ${duration}</span>
+                                ${session.priority ? `<span>🎯 ${session.priority}</span>` : ''}
+                            </div>
+                            ${moodSection}
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error('Error loading sessions:', err);
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h2>Could not load sessions</h2>
+                        <p>Make sure PomodoroWork is running and try again.</p>
+                        <button class="btn-refresh" onclick="loadSessions()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Load on page load
+        loadSessions();
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadSessions, 30000);
+
+        // Shutdown server when page is closed
+        window.addEventListener('pagehide', function () {
+            navigator.sendBeacon('/shutdown');
+        });
+    </script>
+</body>
+
+</html>

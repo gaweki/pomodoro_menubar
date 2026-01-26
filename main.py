@@ -135,9 +135,39 @@ class TaskServer(BaseHTTPRequestHandler):
                     self.send_error(500, "App instance not available")
             except Exception as e:
                 self.send_error(500, f"Error getting settings: {e}")
+        
+        elif parsed_path.path == '/history':
+            # Serve the session history HTML page
+            try:
+                with open(os.path.join(os.path.dirname(__file__), 'history_today.html'), 'r') as f:
+                    html_content = f.read()
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                self.wfile.write(html_content.encode('utf-8'))
+                
+            except Exception as e:
+                self.send_error(500, f"Error serving history page: {e}")
+        
+        elif parsed_path.path == '/api/sessions/today':
+            # Return today's session logs as JSON
+            try:
+                if APP_INSTANCE:
+                    sessions = APP_INSTANCE.session_logger.sessions
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({'sessions': sessions}).encode('utf-8'))
+                else:
+                    self.send_error(500, "App instance not available")
+            except Exception as e:
+                self.send_error(500, f"Error getting sessions: {e}")
                 
         else:
             self.send_error(404, "Not found")
+
 
     def _parse_task_data(self, data):
         """Helper to parse and sanitize task data from JSON"""
@@ -2700,7 +2730,12 @@ class PomodoroMenuBarApp(rumps.App):
         mood_menu.add(rumps.MenuItem("📊 All Time", callback=self.show_mood_analysis))
         stats_menu.add(mood_menu)
         
+        # Add separator and history link
+        stats_menu.add(rumps.separator)
+        stats_menu.add(rumps.MenuItem("🌐 View Today's History", callback=self.open_history_page))
+        
         return stats_menu
+
 
     def _build_settings_menu(self):
         """Build Settings menu"""
@@ -2714,6 +2749,11 @@ class PomodoroMenuBarApp(rumps.App):
         """Open settings HTML page in browser"""
         self.start_server()
         webbrowser.open(f"http://localhost:{self.server_port}/settings_page")
+
+    def open_history_page(self, _):
+        """Open session history HTML page in browser"""
+        self.start_server()
+        webbrowser.open(f"http://localhost:{self.server_port}/history")
 
     # def open_zen(self, _):
     #     """Callback to open Zen Mode with correct duration based on current activity"""
